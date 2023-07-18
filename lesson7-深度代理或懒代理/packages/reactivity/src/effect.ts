@@ -1,11 +1,19 @@
 export let activeEffect;
+
+
+function cleanEffect(effect) {
+    let { deps } = effect;
+    for (let i = 0; i < deps.length; i++) {
+        deps[i].delete(effect);
+    }
+    effect.deps.length = 0;
+}
+
 class ReactiveEffect {
     public active = true // 当前的effect是否是激活的 默认是激活的
     public deps = [] // 记录这个effect依赖的数据
     public parent = undefined // 当前effect的上一个激活的effect 这么做的目的是方便链式查找 还原上一次的activeEffect
-    constructor(public fn) {
-
-    }
+    constructor(public fn, private scheduler) { }
     run() {
         // 如果当前的effect不是激活的 那么只执行fn这个参数函数即可
         if (!this.active) {
@@ -19,6 +27,8 @@ class ReactiveEffect {
             this.parent = activeEffect;
             // 把当前激活中的effect换成自己
             activeEffect = this;
+            // 每次重新执行effect之前 都去清空下这个effect收集的
+            cleanEffect(this);
             // fn里会有对响应式数据取值的操作 取值就会进入到proxy的get代理中
             return this.fn();
         } finally { // finally是无论什么情况下都会走到这里
@@ -28,12 +38,27 @@ class ReactiveEffect {
             this.parent = undefined;
         }
     }
+    stop() {
+        if (this.active) {
+            // 先将effect的依赖全部删除掉
+            cleanEffect(this);
+            // 再将effect置为失活
+            this.active = false;
+        }
+    }
 }
 
 // 依赖收集就是将当前正在执行的effect变成全局的 稍后取值的时候就能够拿到这个全局的effect
-export function effect(fn) {
-    const _effect = new ReactiveEffect(fn);
+export function effect(fn, options: any = {}) {
+    const _effect = new ReactiveEffect(fn, options.scheduler);
     _effect.run(); // 默认让响应式的effect执行一次
+
+    // 绑定this
+    const runner = _effect.run.bind(_effect);
+    // 在runner上添加一个effect属性 就是effect自己
+    runner.effect = _effect;
+    // 返回一个runner方法可以强制手动更新
+    return runner;
 }
 
 // 存放依赖收集的映射表 weakMap中的key必须是对象
@@ -43,7 +68,7 @@ const targetMap = new WeakMap();
  * @param target 目标对象
  * @param key 目标对象的key
  */
-export function track(target, key) {
+export function track(target,type, key) {
     // 说明取值操作不是在effect中取值的 就不需要收集了
     if (!activeEffect) {
         return;
@@ -67,8 +92,6 @@ export function track(target, key) {
         // key去收集effect
         dep.add(activeEffect);
         // effect收集dep 这里是利用闭包的原理 拿到了key对应的set就行了 目的是可以清空
-        console.log(dep);
-
         activeEffect.deps.push(dep);
     }
 }
@@ -85,17 +108,33 @@ export function trigger(target, key, newValue, oldValue) {
     const dep = despMap.get(key);
     // 如果收集过依赖就去遍历Set依次执行effect.run 更新
     if (dep) {
-        dep.forEach(effect => {
-            // 当我重新执行此effect时 会将当前执行的effect放到全局的activeEffect上
+        // 这里相当于复制一个出来
+        const effects = [...dep];
+        // 循环复制出来的数组 这个复制出来的数组不会被
+        effects.forEach(effect => {
+            // // 当我重新执行此effect时 会将当前执行的effect放到全局的activeEffect上
             // activeEffect = effect;
             // 如果正在执行的effect中有赋值操作又会触发执行 这里处理下不再执行 避免死循环
             if (activeEffect !== effect) {
-                effect.run();
-            }
+                // 没有scheduler就执行run方法
+                if (!effect.scheduler) {
+                    effect.run();
+                } else {
+                    // 有scheduler就执行scheduler
+                    effect.scheduler();
+                }
 
+            }
         })
     }
 }
+
+// 死循环怎么来的?
+// 我们循环dep => 执行run方法 => 先去清空这个effect的deps中的自己 => 然后执行this.fn()
+// dep又收集了这个effect => dep.forEach又会遍历到这个effect => 执行run方法 => 清理effect
+// 执行this.fn() => dep又收集了effect 导致死循环
+// 只要我们把dep拷贝一份出来去循环 就不会死循环了
+
 // effect中定义parent的目的是为了处理effect嵌套的问题
 // let activeEffect = e2;
 // effect(() => { // e1 e1.parent = null

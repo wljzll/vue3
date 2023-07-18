@@ -12,24 +12,24 @@
     <div id="app"></div>
     <script type="module">
         // import { reactive, effect } from '/lesson2/node_modules/@vue/reactivity/dist/reactivity.esm-browser.js';
-        import {reactive, effect} from './reactivity.esm.js'
+        import {reactive, effect} from '../packages/reactivity/dist/reactivity.esm.js'
         // 创建一个响应式对象
         const state = { name: 'jw', age: '30' };
         const p1 = reactive(state);
-        const p2 = reactive(p1);
+        // const p2 = reactive(p1);
         
         // effect 副作用函数 默认会执行一次 数据变化后会再次执行
         effect(() => {
             // 当setTimeout中做set操作时 会触发effect中的fn重新执行 effect的fn中又做了set操作 又会执行effect的fn死循环了
-            state.age = Math.random();
-            app.innerHTML = state.name + state.age;
+            p1.age = Math.random();
+            app.innerHTML = p1.name + p1.age;
         });
         // 这种情况下不是在effect中取值 就不需要收集effect
         state.age;
         setTimeout(() => {
             // xxx属性是新加上的所以set xxx时是不会更新的
-            state.name = 'zf';
-        }, 3000);
+            p1.name = 'zf';
+        }, 1000);
         console.log(state);
     </script>
 </body>
