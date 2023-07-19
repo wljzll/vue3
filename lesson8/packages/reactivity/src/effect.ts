@@ -12,7 +12,9 @@ class ReactiveEffect {
   public active = true; // 当前的effect是否是激活的 默认是激活的
   public deps = []; // 记录这个effect依赖的数据
   public parent = undefined; // 当前effect的上一个激活的effect 这么做的目的是方便链式查找 还原上一次的activeEffect
+  // 传入要执行的回调函数和自定义渲染器
   constructor(public fn, private scheduler) {}
+  // run方法执行回调 清理上次收集的依赖
   run() {
     // 如果当前的effect不是激活的 那么只执行fn这个参数函数即可
     if (!this.active) {
@@ -38,6 +40,7 @@ class ReactiveEffect {
       this.parent = undefined;
     }
   }
+  // 停止Effect实例的响应
   stop() {
     if (this.active) {
       // 先将effect的依赖全部删除掉
