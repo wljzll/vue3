@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import {
+        reactive,
+        effect,
+        computed,
+        ref,
+      } from "/lesson8/node_modules/@vue/reactivity/dist/reactivity.esm-browser.js";
+      // import { reactive, effect } from './reactivity.esm.js'
+      // 创建一个响应式对象
+      const flag = ref(false);
+      effect(() => {
+        document.body.innerHTML = flag.value ? 30 : "姜文";
+      });
+      setTimeout(() => {
+        flag.value = true;
+      }, 1000);
+    </script>
+  </body>
+</html>
