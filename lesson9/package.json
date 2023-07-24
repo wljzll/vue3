@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pnpm": "^8.6.7",
     "vue": "^3.2.41"
   },
   "devDependencies": {
