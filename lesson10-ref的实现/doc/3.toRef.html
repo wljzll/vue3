@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // import {
+      //   reactive,
+      //   effect,
+      //   computed,
+      //   ref,
+      // } from "../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js";
+      import {
+        reactive,
+        effect,
+        ref,
+        toRefs,
+      } from "../packages/reactivity/dist/reactivity.esm.js";
+
+
+      const state = reactive({ name: "jw", age: 30 });
+
+      let person = { ...toRefs(state) }; // 解构的时候将所有的属性都转换成ref即可
+      effect(() => {
+        document.body.innerHTML =
+          person.name.value + "今年" + person.age.value + "岁了";
+      });
+      setTimeout(() => {
+        person.age.value = 31;
+      }, 1000);
+    </script>
+  </body>
+</html>

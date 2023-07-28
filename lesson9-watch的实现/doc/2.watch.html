@@ -11,15 +11,16 @@
 <body>
     <div id="app"></div>
     <script type="module">
-        import { reactive, effect, computed, watch } from '/lesson9/node_modules/vue/dist/vue.runtime.esm-browser.js';
-        console.log(watch);
+        // import { reactive, effect, computed, watch } from '/lesson9/node_modules/vue/dist/vue.runtime.esm-browser.js';
+        import { reactive, effect, computed, watch } from '../packages/reactivity/dist/reactivity.esm.js'
+        debugger;
         const state = reactive({ flag: false, name: 'jw', age: '30', n: { m: 3 } });
 
-        watch(() => state.n.m, (newValue, oldValue) => {
+        watch(() => state.name, (newValue, oldValue) => {
             console.log(newValue, oldValue);
         })
 
-        state.n.m = 'zf'
+        state.name = 'zf'
     </script>
 </body>
 

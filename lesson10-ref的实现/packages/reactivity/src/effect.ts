@@ -8,7 +8,7 @@ function cleanEffect(effect) {
   effect.deps.length = 0;
 }
 
-class ReactiveEffect {
+export class ReactiveEffect {
   public active = true; // 当前的effect是否是激活的 默认是激活的
   public deps = []; // 记录这个effect依赖的数据
   public parent = undefined; // 当前effect的上一个激活的effect 这么做的目的是方便链式查找 还原上一次的activeEffect

@@ -1,5 +1,5 @@
 import { isFunction } from "@vue/shared";
-import { ReactiveEffect } from "vue";
+import { ReactiveEffect } from "@vue/reactivity";
 import { activeEffect, trackEffect, triggerEffect } from "./effect";
 
 class computedRefImpl {

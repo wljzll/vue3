@@ -57,7 +57,7 @@ function doWatch(source, cb, { immediate } = {} as any) {
   if (immediate) {
     job();
   }
-  // 执行一次run方法 获取一次老值
+  // 执行一次run方法 触发getter执行 触发依赖收集watch的effect 获取一次老值
   oldValue = effect.run();
 }
 
