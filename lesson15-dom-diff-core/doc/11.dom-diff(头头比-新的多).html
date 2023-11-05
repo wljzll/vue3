@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // import {
+      //   createRenderer,
+      //   h,
+      //   // render,
+      // } from "../node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js";
+
+      import {
+        h,
+        render,
+      } from "../packages/runtime-dom/dist/runtime-dom.esm.js";
+      render(
+        h("div", [h("li", { key: "a" }, "a"), h("li", { key: "b" }, "b")]),
+        app
+      );
+
+      setTimeout(() => {
+        render(
+          h("div", [
+            h("li", { key: "a" }, "a"),
+            h("li", { key: "b" }, "b"),
+            h("li", { key: "c" }, "c"),
+          ]),
+          app
+        );
+      }, 1000);
+    </script>
+  </body>
+</html>

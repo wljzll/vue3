@@ -27,9 +27,9 @@ function traverse(value, seen = new Set()) {
 
 function doWatch(source, cb, { immediate } = {} as any) {
   let getter;
-  if (isReactive(getter)) {
+  if (isReactive(source)) {
     // 这里是不是只有当deep=true的时候才需要深度遍历？
-    getter = () => traverse(getter);
+    getter = () => traverse(source);
   } else if (isFunction(source)) {
     getter = source;
   }

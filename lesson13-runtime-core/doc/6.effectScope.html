@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import {
+        reactive,
+        effect,
+        computed,
+        ref,
+        toRef,
+        effectScope,
+      } from "../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js";
+      // import {
+      //   reactive,
+      //   effect,
+      //   ref,
+      // } from "../packages/reactivity/dist/reactivity.esm.js";
+      const scope = effectScope(true);
+
+      scope.run(() => {
+        const state = reactive({ age: 30 });
+        effect(() => {
+          console.log(state.age);
+        });
+        setTimeout(() => {
+          state.age++;
+        }, 1000);
+      });
+
+      scope.run(() => {
+        const state = reactive({ name: "zf" });
+        effect(() => {
+          console.log(state.name);
+        });
+        setTimeout(() => {
+          state.name += "1";
+        }, 1000);
+      });
+      scope.stop();
+    </script>
+  </body>
+</html>

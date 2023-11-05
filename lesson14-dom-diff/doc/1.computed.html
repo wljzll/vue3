@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module">
+        import { reactive, effect, computed } from '/lesson8/node_modules/@vue/reactivity/dist/reactivity.esm-browser.js';
+        // import { reactive, effect } from './reactivity.esm.js'
+        // 创建一个响应式对象
+        const state = reactive({ flag: false, name: 'jw', age: '30' });
+
+        let aliasName = computed(() => {
+          console.log('默认不执行');
+          return '珠峰' + state.name;
+        })
+
+        aliasName.value;
+        
+        aliasName.value = '123'; // Write operation failed: computed value is readonly
+        state.name = '珠峰 姜文'
+
+        console.log(aliasName.value)
+
+        /*
+         * 1. 计算属性内部需要一个变量, 这个变量控制是否要重新执行dirty, 默认肯定需要执行
+         * 2. 内部默认dirty是true, 此时用户取值会执行此方法, computed拿到返回的结果并缓存起来, 
+         *    将dirty置为false
+         * 3. 再次取值时, 如果dirty是false, 则使用缓存的值
+         * 4. 如果值变化了, 将dirty置为true, 取值的时候重新执行
+         *
+         * */
+    </script>
+</body>
+
+</html>
